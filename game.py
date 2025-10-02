@@ -44,7 +44,7 @@ def start_combat(inimigos):
             print(f'{inimigo['nome']}: {inimigo['pv']}/{inimigo['pv_max']} PV')
         print("---------------")
 
-        alvos_vivos = [inimigo['nome'].lower() for inimigo in inimigos if inimigo > 0]
+        alvos_vivos = [inimigo['nome'].lower() for inimigo in inimigos if inimigo['pv'] > 0]
         comando = ''
         while comando not in alvos_vivos:
             comando = input(f'Seu turno. Atacar quem? {alvos_vivos}\n').lower()
