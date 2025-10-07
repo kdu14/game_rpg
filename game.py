@@ -5,7 +5,7 @@ import random
 import time
 import markovify
 
-# --- CONFIGURAÇÃO DOS MODELOS DE IA ---
+# cadeia de markov
 try:
     with open("corpus.txt", encoding="utf-8") as f:
         modelo_narrador_ia = markovify.Text(f.read())
@@ -33,7 +33,6 @@ try:
 except Exception as e:
     print(f"[AVISO] Não foi possível carregar o corpus_vitoria.txt: {e}")
     modelo_vitoria = None
-# -----------------------------------------
 
 def narrador(texto):
     # verificação para evitar o erro de áudio com 'None'
@@ -169,7 +168,7 @@ def main():
                 if frase_gerada:
                     narrador(frase_gerada)
                 else:
-                    # se a IA falhou ou não foi carregada, usamos a frase padrão
+                    # se a IA falhou, usa a frase padrão
                     narrador("O silêncio da mata é pesado e opressor.")
                 
                 time.sleep(1)
