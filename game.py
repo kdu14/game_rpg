@@ -116,7 +116,7 @@ def start_game():
     narrador("...dois goblins ameaçam um homem caído.")
     print("-" * 30)
     narrador("O que você faz?")
-    print("Comandos: [atacar], [ignorar], [esconder]")
+    print("Comandos: [atacar], [ignorar]")
 
 def main():
     narrador("Bem vindo a Eldoria! Uma aventura te aguarda.")
@@ -155,12 +155,7 @@ def main():
                     status_game["cena_atual"] = "pos_combate"
                 else:
                     narrador("Você foi derrotado... Sua jornada termina aqui.")
-                    break
-            
-            elif comando == "ignorar":
-                narrador("Você decide que a vida de um desconhecido não vale o risco e sai de fininho.")
-                narrador("\nFIM")
-                break 
+                    break 
 
             elif comando == "esconder":
                 narrador("Você mergulha na vegetação alta para observar a cena...")
