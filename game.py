@@ -5,6 +5,7 @@ import random
 import time
 import markovify
 
+# --- CONFIGURAÇÃO DOS MODELOS DE IA ---
 try:
     with open("corpus.txt", encoding="utf-8") as f:
         modelo_narrador_ia = markovify.Text(f.read())
@@ -12,7 +13,6 @@ except Exception as e:
     print(f"[AVISO] Não foi possível carregar o corpus.txt: {e}")
     modelo_narrador_ia = None
 
-# Corrigido para bater com os nomes dos seus arquivos
 try:
     with open("corpus_atq_jogador.txt", encoding="utf-8") as f:
         modelo_ataque_jogador = markovify.Text(f.read())
@@ -26,6 +26,15 @@ try:
 except Exception as e:
     print(f"[AVISO] Não foi possível carregar o corpus_atq_inimigo.txt: {e}")
     modelo_ataque_inimigo = None
+
+# NOVIDADE: Carregando o modelo de vitória
+try:
+    with open("corpus_vitoria.txt", encoding="utf-8") as f:
+        modelo_vitoria = markovify.Text(f.read())
+except Exception as e:
+    print(f"[AVISO] Não foi possível carregar o corpus_vitoria.txt: {e}")
+    modelo_vitoria = None
+# -----------------------------------------
 
 def narrador(texto):
     print(texto)
@@ -65,11 +74,10 @@ def start_combat(inimigos):
         
         for inimigo in inimigos:
             if inimigo['nome'].lower() == comando:
-                # ===== CONEXÃO COM A IA DO JOGADOR =====
                 if modelo_ataque_jogador:
                     frase_ataque = modelo_ataque_jogador.make_sentence(tries=100) or "Você ataca!"
                     narrador(frase_ataque)
-                else: # Fallback se o modelo não carregar
+                else:
                     narrador(f'Você ataca {inimigo["nome"]}!')
                 
                 dano_causado = random.randint(status_jogador['dano_min'], status_jogador['dano_max'])
@@ -87,11 +95,10 @@ def start_combat(inimigos):
         time.sleep(1)
         for inimigo in inimigos:
             if inimigo['pv'] > 0:
-                # ===== CONEXÃO COM A IA DO INIMIGO =====
                 if modelo_ataque_inimigo:
                     frase_ataque = modelo_ataque_inimigo.make_sentence(tries=100) or "O inimigo ataca!"
                     narrador(f"{inimigo['nome']}: {frase_ataque}")
-                else: # Fallback
+                else:
                      narrador(f'{inimigo["nome"]} ataca você!')
 
                 dano_recebido = random.randint(inimigo['dano_min'], inimigo['dano_max'])
@@ -124,7 +131,6 @@ def main():
                 break
 
             elif comando == "atacar":
-                # Você tinha mudado os stats dos goblins, voltei para o original para o combate ser mais rápido
                 inimigos_da_luta = [
                     {"nome": "Goblin A", "pv": 8, "pv_max": 8, "dano_min": 1, "dano_max": 4},
                     {"nome": "Goblin B", "pv": 8, "pv_max": 8, "dano_min": 1, "dano_max": 4}
@@ -132,7 +138,13 @@ def main():
                 resultado = start_combat(inimigos_da_luta)
                 
                 if resultado:
-                    narrador("Você venceu a batalha!")
+                    # ===== CONEXÃO COM A IA DE VITÓRIA =====
+                    if modelo_vitoria:
+                        frase_vitoria = modelo_vitoria.make_sentence(tries=100) or "Você venceu a batalha!"
+                        narrador(frase_vitoria)
+                    else:
+                        narrador("Você venceu a batalha!")
+
                     time.sleep(1)
                     xp_ganho = 50
                     status_jogador['xp'] += xp_ganho
@@ -149,7 +161,6 @@ def main():
                 narrador("\nFIM")
                 break 
 
-            # ===== CONEXÃO COM A IA DE AMBIENTE =====
             elif comando == "esconder":
                 narrador("Você mergulha na vegetação alta e observa a cena...")
                 time.sleep(1)
