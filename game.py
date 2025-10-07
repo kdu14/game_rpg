@@ -27,7 +27,6 @@ except Exception as e:
     print(f"[AVISO] Não foi possível carregar o corpus_atq_inimigo.txt: {e}")
     modelo_ataque_inimigo = None
 
-# NOVIDADE: Carregando o modelo de vitória
 try:
     with open("corpus_vitoria.txt", encoding="utf-8") as f:
         modelo_vitoria = markovify.Text(f.read())
@@ -37,6 +36,9 @@ except Exception as e:
 # -----------------------------------------
 
 def narrador(texto):
+    # verificação para evitar o erro de áudio com 'None'
+    if not texto:
+        return
     print(texto)
     try:
         tts = gTTS(text=texto, lang='pt-br')
@@ -75,8 +77,8 @@ def start_combat(inimigos):
         for inimigo in inimigos:
             if inimigo['nome'].lower() == comando:
                 if modelo_ataque_jogador:
-                    frase_ataque = modelo_ataque_jogador.make_sentence(tries=100) or "Você ataca!"
-                    narrador(frase_ataque)
+                    frase_ataque = modelo_ataque_jogador.make_sentence(tries=100)
+                    narrador(frase_ataque or "Você ataca!")
                 else:
                     narrador(f'Você ataca {inimigo["nome"]}!')
                 
@@ -96,8 +98,8 @@ def start_combat(inimigos):
         for inimigo in inimigos:
             if inimigo['pv'] > 0:
                 if modelo_ataque_inimigo:
-                    frase_ataque = modelo_ataque_inimigo.make_sentence(tries=100) or "O inimigo ataca!"
-                    narrador(f"{inimigo['nome']}: {frase_ataque}")
+                    frase_ataque = modelo_ataque_inimigo.make_sentence(tries=100)
+                    narrador(f"{inimigo['nome']}: {frase_ataque or 'ataca sem piedade!'}")
                 else:
                      narrador(f'{inimigo["nome"]} ataca você!')
 
@@ -132,16 +134,15 @@ def main():
 
             elif comando == "atacar":
                 inimigos_da_luta = [
-                    {"nome": "Goblin A", "pv": 8, "pv_max": 8, "dano_min": 1, "dano_max": 4},
-                    {"nome": "Goblin B", "pv": 8, "pv_max": 8, "dano_min": 1, "dano_max": 4}
+                    {"nome": "Goblin A", "pv": 7, "pv_max": 7, "dano_min": 1, "dano_max": 3},
+                    {"nome": "Goblin B", "pv": 7, "pv_max": 7, "dano_min": 1, "dano_max": 3}
                 ]
                 resultado = start_combat(inimigos_da_luta)
                 
                 if resultado:
-                    # ===== CONEXÃO COM A IA DE VITÓRIA =====
                     if modelo_vitoria:
-                        frase_vitoria = modelo_vitoria.make_sentence(tries=100) or "Você venceu a batalha!"
-                        narrador(frase_vitoria)
+                        frase_vitoria = modelo_vitoria.make_sentence(tries=100)
+                        narrador(frase_vitoria or "Você venceu a batalha!")
                     else:
                         narrador("Você venceu a batalha!")
 
@@ -162,15 +163,22 @@ def main():
                 break 
 
             elif comando == "esconder":
-                narrador("Você mergulha na vegetação alta e observa a cena...")
+                narrador("Você mergulha na vegetação alta para observar a cena...")
                 time.sleep(1)
+
+                frase_gerada = None
                 if modelo_narrador_ia:
-                    frase_gerada = modelo_narrador_ia.make_short_sentence(100, tries=100)
-                    narrador(frase_gerada or "O silêncio da mata é pesado e opressor.")
-                else:
-                    narrador("Você se esconde e observa os goblins roubarem o mercador e irem embora.")
+                    frase_gerada = modelo_narrador_ia.make_short_sentence(140, tries=100)
                 
-                narrador("Você espera eles irem embora e continua seu caminho em segurança.")
+                # checamos se a frase foi gerada com sucesso ANTES de usá-la
+                if frase_gerada:
+                    narrador(frase_gerada)
+                else:
+                    # se a IA falhou ou não foi carregada, usamos a frase padrão
+                    narrador("O silêncio da mata é pesado e opressor.")
+                
+                time.sleep(1)
+                narrador("Você decide não se arriscar e espera os goblins irem embora. Você continua seu caminho em segurança.")
                 narrador("\nFIM")
                 break
             
