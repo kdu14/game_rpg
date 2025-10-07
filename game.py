@@ -3,6 +3,29 @@ from playsound import playsound
 import os
 import random
 import time
+import markovify
+
+try:
+    with open("corpus.txt", encoding="utf-8") as f:
+        modelo_narrador_ia = markovify.Text(f.read())
+except Exception as e:
+    print(f"[AVISO] Não foi possível carregar o corpus.txt: {e}")
+    modelo_narrador_ia = None
+
+# NOVIDADE: Carregando os modelos de combate
+try:
+    with open("corpus_ataque_jogador.txt", encoding="utf-8") as f:
+        modelo_ataque_jogador = markovify.Text(f.read())
+except Exception as e:
+    print(f"[AVISO] Não foi possível carregar o corpus_ataque_jogador.txt: {e}")
+    modelo_ataque_jogador = None
+
+try:
+    with open("corpus_ataque_inimigo.txt", encoding="utf-8") as f:
+        modelo_ataque_inimigo = markovify.Text(f.read())
+except Exception as e:
+    print(f"[AVISO] Não foi possível carregar o corpus_ataque_inimigo.txt: {e}")
+    modelo_ataque_inimigo = None
 
 def narrador(texto):
     print(texto)
@@ -15,7 +38,6 @@ def narrador(texto):
     except Exception as e:
         print(f'\n [AVISO: Houve um erro ao gerar o audio: {e}]')
 
-# Mantemos o XP para dar uma sensação de progresso
 status_jogador = {
     'pv': 20,
     'pv_max': 20,
@@ -106,7 +128,7 @@ def main():
                     narrador("Você venceu a batalha!")
                     time.sleep(1)
 
-                    # Apenas a recompensa de XP, como você pediu
+                    #Recompensa de XP
                     xp_ganho = 50
                     status_jogador['xp'] += xp_ganho
                     narrador(f"Você ganhou {xp_ganho} pontos de experiência!")
@@ -135,12 +157,17 @@ def main():
         elif status_game["cena_atual"] == "pos_combate":
             narrador("A poeira baixa. O mercador salvo se levanta, limpando as roupas e olha para você com gratidão.")
             time.sleep(1)
+            
             narrador("'Ufa... essa foi por pouco! Muito obrigado, meu jovem. Se não fosse por você, eu certamente seria comida de goblin.'")
             time.sleep(1)
+            
             narrador("'Meu nome é Barnaby. Tome, não é muito, mas é o mínimo que posso fazer.'")
+            
             narrador("Ele te entrega um pequeno saco com algumas moedas de prata, que tilintam em sua mão.")
             time.sleep(1)
+            
             narrador("\nCom seu primeiro ato heroico concluído, você se despede de Barnaby e continua sua jornada, mais experiente e um pouco mais rico.")
+            
             narrador("\nFIM")
             break # Encerra o jogo com a vitória.
 
