@@ -116,7 +116,7 @@ def start_game():
     narrador("...dois goblins ameaçam um homem caído.")
     print("-" * 30)
     narrador("O que você faz?")
-    print("Comandos: [atacar], [ignorar]")
+    print("Comandos: [atacar], [esconder]")
 
 def main():
     narrador("Bem vindo a Eldoria! Uma aventura te aguarda.")
